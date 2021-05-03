@@ -5,7 +5,7 @@ import csv
 from collections import deque
 
 #ser = serial.Serial('/dev/cu.usbserial-14110', 115200) #ポートの情報を記入
-ser = serial.Serial('/dev/cu.usbserial-1430', 115200) #ポートの情報を記入
+ser = serial.Serial('/dev/cu.usbserial-1410', 115200) #ポートの情報を記入
 
 d_red = deque()
 d_ir = deque()
@@ -18,16 +18,19 @@ while(1):
     print(toCsv)
     d_red.append(toCsv[0])
     d_ir.append(toCsv[1])
+    n_thr, red_mean, ir_mean = 0, 0, 0
 
     # BUFFERSIZE + 1になったらpopする
     if len(d_red) > BUFFER_SIZE:
         r = d_red.popleft()
-        print("red mean", sum(d_red) / BUFFER_SIZE)
+        red_mean = sum(d_red) / BUFFER_SIZE
+        print("red mean", red_mean)
 
     ax = []
     if len(d_ir) > BUFFER_SIZE:
         ir = d_ir.popleft()
-        print("ir mean", sum(d_ir)/ BUFFER_SIZE)
+        ir_mean = sum(d_ir)/ BUFFER_SIZE
+        print("ir mean", ir_mean)
         for item in d_ir:
             ax.append(item - sum(d_ir) / BUFFER_SIZE)
         ## ここ別に4 point moving averageじゃなくてもいいかもしれない
@@ -38,5 +41,5 @@ while(1):
 
     with open('data.csv', 'a') as f:
         writer = csv.writer(f)
-        writer.writerow(toCsv)
+        writer.writerow([n_thr, red_mean, ir_mean])
     
