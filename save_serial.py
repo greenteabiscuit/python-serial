@@ -3,6 +3,8 @@ import serial
 import datetime
 import csv
 from collections import deque
+import matplotlib.pyplot as plt
+import numpy as np
 
 #ser = serial.Serial('/dev/cu.usbserial-14110', 115200) #ポートの情報を記入
 ser = serial.Serial('/dev/cu.usbserial-1410', 115200) #ポートの情報を記入
@@ -10,6 +12,9 @@ ser = serial.Serial('/dev/cu.usbserial-1410', 115200) #ポートの情報を記�
 d_red = deque()
 d_ir = deque()
 BUFFER_SIZE = 100
+
+fig, axes = plt.subplots(1, 1)
+x = np.arange(0, 100, 1)
 
 while(1):
     line = ser.readline().decode('utf-8')
@@ -38,8 +43,11 @@ while(1):
             ax[i] = (ax[i] + ax[i + 1] + ax[i + 2] + ax[i + 3]) / 4       
         n_thr = sum(ax) / (BUFFER_SIZE - 4)
         print("threshold:", n_thr)
-
-    with open('data.csv', 'a') as f:
-        writer = csv.writer(f)
-        writer.writerow([n_thr, red_mean, ir_mean])
+        axes.set_ylim((min(ax) // 10 * 10 - 100, max(ax) // 10 * 10 + 100))
+        line, = axes.plot(x, ax, color='blue')
+        plt.pause(0.01)
+        line.remove()
+        #with open('data.csv', 'a') as f:
+        #    writer = csv.writer(f)
+        #    writer.writerow(ax)
     
