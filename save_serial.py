@@ -26,8 +26,8 @@ while(1):
     n_thr_ir, n_thr_red, red_mean, ir_mean = 0, 0, 0, 0
 
     # BUFFERSIZE + 1になったらpopする
-    red_lis = []
-    if len(d_red) > BUFFER_SIZE:
+    red_lis, ir_lis = [], []
+    if len(d_red) > BUFFER_SIZE and len(d_ir) > BUFFER_SIZE:
         r = d_red.popleft()
         red_mean = sum(d_red) / BUFFER_SIZE
         print("red mean", red_mean)
@@ -41,8 +41,6 @@ while(1):
         axes.set_ylim((min(red_lis) // 10 * 10 - 100, max(red_lis) // 10 * 10 + 100))
         line_red, = axes.plot(x, red_lis, color='red')
 
-    ir_lis = []
-    if len(d_ir) > BUFFER_SIZE:
         ir = d_ir.popleft()
         ir_mean = sum(d_ir)/ BUFFER_SIZE
         print("ir mean", ir_mean)
@@ -53,7 +51,9 @@ while(1):
             ir_lis[i] = (ir_lis[i] + ir_lis[i + 1] + ir_lis[i + 2] + ir_lis[i + 3]) / 4       
         n_thr_ir = sum(ir_lis) / (BUFFER_SIZE - 4)
         print("ir threshold:", n_thr_ir)
-        axes.set_ylim((min(ir_lis) // 10 * 10 - 100, max(ir_lis) // 10 * 10 + 100))
+        min_of_both = min(min(ir_lis), min(red_lis))
+        max_of_both = max(max(ir_lis), max(red_lis))
+        axes.set_ylim((min_of_both // 10 * 10 - 20, max_of_both // 10 * 10 + 20))
         line_ir, = axes.plot(x, ir_lis, color='blue')
         plt.pause(0.01)
         line_ir.remove()
